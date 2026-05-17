@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "root": {
+    "ref": "1",
+    "type": "pallet#0"
+  },
+  "objects": {
+    "1": {
+      "barcode": "Mulletman2113.WagieFord",
+      "title": "Wagie Ford ",
+      "description": "",
+      "unlockable": false,
+      "redacted": false,
+      "author": "Mulletman2113",
+      "version": "0.0.0",
+      "sdkVersion": "1.2.0",
+      "internal": false,
+      "crates": [
+        {
+          "ref": "2",
+          "type": "crate-avatar#0"
+        }
+      ],
+      "dataCards": [],
+      "tags": [],
+      "changelogs": [],
+      "isa": {
+        "type": "pallet#0"
+      }
+    },
+    "2": {
+      "barcode": "Mulletman2113.WagieFord.Avatar.711Ford",
+      "title": "711 Ford",
+      "description": "",
+      "unlockable": false,
+      "redacted": false,
+      "packedAssets": [
+        {
+          "title": "PreviewMesh",
+          "guid": "d9b7061e24152294fab7eb4b0418b204"
+        }
+      ],
+      "mainAsset": "fd11f3899a7701f47ba24d10504639fc",
+      "tags": [],
+      "colliderBounds": {
+        "center": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "extents": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "isa": {
+        "type": "crate-avatar#0"
+      }
+    }
+  }
+}
