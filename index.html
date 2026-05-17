@@ -3,101 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quest Mod Installer</title>
+    <title>Universal VR Mod Installer</title>
+    
+    <!-- Unblocked standalone drivers loaded globally so browser security cannot freeze the loop -->
+    <script src="https://jsdelivr.net"></script>
+    <script src="https://jsdelivr.net"></script>
+
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; gap: 40px; padding: 50px; background: #0b132b; color: white; }
-        .card { background: #1c2541; padding: 30px; border-radius: 12px; width: 420px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        h2 { font-size: 24px; margin-top: 0; color: #38b000; }
-        h1 { font-size: 26px; color: #3a86ff; margin-top: 0; }
-        ol { padding-left: 20px; text-align: left; color: #cbd5e1; font-size: 14px; line-height: 1.8; }
-        .btn-connect { display: block; width: 100%; padding: 15px; margin: 20px 0; font-size: 16px; font-weight: bold; background: #3a86ff; color: white; border: none; border-radius: 8px; cursor: pointer; }
-        .btn-connect:hover { background: #2563eb; }
-        .status-box { background: #111827; padding: 12px; border-radius: 6px; font-size: 14px; color: #9ca3af; text-align: center; }
-        .game-item { background: #0b132b; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: left; border: 1px solid #334155; }
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .game-name { font-weight: bold; font-size: 16px; }
-        .badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-        .badge.paid { background: #ffb703; color: #000; }
-        .badge.free { background: #38b000; color: white; }
-        .game-desc { font-size: 12px; color: #94a3b8; margin: 5px 0 10px 0; }
-        .btn-download { display: inline-block; text-decoration: none; padding: 8px 12px; font-size: 12px; font-weight: bold; background: #38b000; color: white; border-radius: 4px; width: calc(100% - 24px); text-align: center; }
-        .btn-download:hover { background: #008000; }
-        .scroll-container { max-height: 600px; overflow-y: auto; padding-right: 5px; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 40px 20px; 
+            background: #121214; 
+            color: #ffffff; 
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #1a1a1e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h1 { color: #3b82f6; margin-bottom: 10px; }
+        p { color: #a1a1aa; font-size: 14px; margin-bottom: 30px; }
+        #connectBtn { 
+            background: #2563eb; 
+            color: white; 
+            border: none; 
+            padding: 14px 28px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: background 0.2s;
+        }
+        #connectBtn:hover { background: #1d4ed8; }
+        #status { 
+            margin-top: 25px; 
+            font-weight: 500; 
+            font-size: 15px;
+            background: #27272a;
+            padding: 15px;
+            border-radius: 6px;
+            min-height: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>Quest Mod Installer</h1>
-        <p style="font-size:12px; color:#94a3b8; margin-top:-10px;">The simplest web tool to patch your standalone VR games</p>
-        <ol>
-            <li>Connect your Meta Quest via USB-C.</li>
-            <li>Put on your headset and click Allow.</li>
-            <li>Click the connection button below.</li>
-        </ol>
-        <button id="connectBtn" class="btn-connect">Connect to VR Headset</button>
-        <div id="status" class="status-box">Dashboard Status: Ready. Waiting...</div>
+    <div class="container">
+        <h1>🎮 Universal VR Mod Installer</h1>
+        <p>Connect your Quest via USB to inject Bonelab & Beat Saber mods instantly.</p>
+        
+        <button id="connectBtn">🔌 Connect VR Headset</button>
+        
+        <div id="status">Status: Ready to connect...</div>
     </div>
 
-    <div class="card">
-        <h2>Top Moddable VR Games</h2>
-        <p style="font-size:12px; color:#94a3b8; margin-top:-10px; margin-bottom: 20px;">Click any button below to download its mod pack instantly on any computer</p>
+    <script>
+        const Adb = window['@yume-chan/adb']?.Adb;
+        const AdbWebUsbBackend = window['@yume-chan/adb-backend-webusb']?.AdbWebUsbBackend;
 
-        <div class="scroll-container">
-            <!-- 1. Beat Saber -->
-            <div class="game-item">
-                <div class="game-header">
-                    <span class="game-name">1. Beat Saber (Custom Songs)</span>
-                    <span class="badge paid">Paid</span>
-                </div>
-                <div class="game-desc">Adds in-game custom mapping and track downloader components.</div>
-                <a href="mods/SongDownloader.qmod" download class="btn-download">⚡ Download: SongDownloader.qmod</a>
-            </div>
+        const modConfig = {
+            "bonelab_mods": [
+                "Mulletman2113.WagieFord.pallet.json",
+                "Mulletman2113.WagieFord_mon.bundle",
+                "catalog_Mulletman2113.WagieFord.hash",
+                "catalog_Mulletman2113.WagieFord.json"
+            ],
+            "beatsaber_mods": [
+                "SongDownloader.qmod"
+            ]
+        };
 
-            <!-- 2. BONELAB - BabaYaga -->
-            <div class="game-item">
-                <div class="game-header">
-                    <span class="game-name">2. BONELAB (John Wick Avatar)</span>
-                    <span class="badge paid">Paid</span>
-                </div>
-                <div class="game-desc">Injects custom player model with altered scaling and speed stats.</div>
-                <a href="mods/bonelab/BabaYaga.hotc" download class="btn-download">⚡ Download: BabaYaga.hotc</a>
-            </div>
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            const statusText = document.getElementById('status');
+            statusText.style.color = "#ffffff";
+            statusText.innerText = "Status: Initializing connection protocol...";
 
-            <!-- 3. BONELAB - 7Eleven -->
-            <div class="game-item">
-                <div class="game-header">
-                    <span class="game-name">3. BONELAB (7-Eleven Map)</span>
-                    <span class="badge paid">Paid</span>
-                </div>
-                <div class="game-desc">Adds a highly interactive sandbox map layout with fully custom assets.</div>
-                <a href="mods/bonelab/7ElevenMap.mel" download class="btn-download">⚡ Download: 7ElevenMap.mel</a>
-            </div>
+            try {
+                if (!Adb || !AdbWebUsbBackend) {
+                    throw new Error("ADB drivers failed to load. Check your internet connection!");
+                }
 
-            <!-- 4. BONELAB - SpiderMonke -->
-            <div class="game-item">
-                <div class="game-header">
-                    <span class="game-name">4. BONELAB (Spider-Man Mod)</span>
-                    <span class="badge paid">Paid</span>
-                </div>
-                <div class="game-desc">Adds functional web-shooting and physics-based swinging controls.</div>
-                <a href="mods/bonelab/SpiderMonke.mel" download class="btn-download">⚡ Download: SpiderMonke.mel</a>
-            </div>
+                const device = await navigator.usb.requestDevice({ filters: [] });
+                statusText.innerText = `Status: Found ${device.productName}. Opening protocol pathways...`;
 
-            <!-- 5. Pavlov Shack -->
-            <div class="game-item">
-                <div class="game-header">
-                    <span class="game-name">5. Pavlov Shack (Custom Guns)</span>
-                    <span class="badge free">Free</span>
-                </div>
-                <div class="game-desc">Unlocks advanced sandbox gun frames and custom sound layouts.</div>
-                <a href="mods/WeaponsPack.qmod" download class="btn-download">⚡ Download: WeaponsPack.qmod</a>
-            </div>
-        </div>
-    </div>
+                const backend = new AdbWebUsbBackend(device);
+                const adb = await Adb.create(backend);
+                
+                statusText.style.color = "#3b82f6"; 
+                statusText.innerText = "Status: Connected! Opening data sync stream...";
 
-    <script type="module" src="app3.js"></script>
+                const sync = await adb.sync();
+
+                // 1. INJECT BONELAB MODS (Looks inside your mods/bonelab subfolder path!)
+                statusText.innerText = "Status: Injecting avatar files into BONELAB partition...";
+                const bonelabFolder = '/sdcard/Android/data/com.StressLevelZero.BONELAB/files/Mods/';
+
+                for (const modName of modConfig.bonelab_mods) {
+                    try {
+                        const response = await fetch(`./mods/bonelab/${modName}`);
+                        if (!response.ok) continue; 
+                        const buffer = await response.arrayBuffer();
+                        
+                        const writer = await sync.write(`${bonelabFolder}${modName}`);
+                        await writer.write(new Uint8Array(buffer));
+                        await writer.close();
+                    } catch (e) {
+                        console.error(`Failed to push ${modName}:`, e);
+                    }
+                }
+
+                // 2. INJECT BEAT SABER MODS (Looks inside your root directory path!)
+                statusText.innerText = "Status: Injecting custom configurations into Beat Saber...";
+                const beatSaberFolder = '/sdcard/ModData/com.beatgames.beatsaber/Mods/';
+
+                for (const modName of modConfig.beatsaber_mods) {
+                    try {
+                        const response = await fetch(`./${modName}`);
+                        if (!response.ok) continue;
+                        const buffer = await response.arrayBuffer();
+                        
+                        const writer = await sync.write(`${beatSaberFolder}${modName}`);
+                        await writer.write(new Uint8Array(buffer));
+                        await writer.close();
+                    } catch (e) {
+                        console.error(`Failed to push ${modName}:`, e);
+                    }
+                }
+
+                await sync.close();
+                statusText.style.color = "#4ade80"; 
+                statusText.innerText = "Status: Success! All available mods have been successfully pushed into your headset.";
+
+            } catch (error) {
+                statusText.style.color = "#ef4444"; 
+                statusText.innerText = "🚨 Modding Failure: " + error.message;
+                console.error(error);
+            }
+        });
+    </script>
 </body>
 </html>
