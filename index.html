@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Universal VR Mod Installer</title>
     
-    <!-- Unblocked standalone drivers loaded globally so browser security cannot freeze the loop -->
+    <!-- Flat layout delivery scripts loaded globally to completely bypass browser blocks -->
     <script src="https://jsdelivr.net"></script>
     <script src="https://jsdelivr.net"></script>
 
@@ -24,6 +24,11 @@
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
         }
         h1 { color: #3b82f6; margin-bottom: 10px; }
         p { color: #a1a1aa; font-size: 14px; margin-bottom: 30px; }
@@ -53,8 +58,11 @@
 <body>
 
     <div class="container">
-        <h1>🎮 Universal VR Mod Installer</h1>
-        <p>Connect your Quest via USB to inject Bonelab & Beat Saber mods instantly.</p>
+        <!-- Embedded app logo vector HEADSET icon -->
+        <img class="logo-img" src="https://flaticon.com" alt="VR Logo">
+        
+        <h1>Universal VR Mod Installer</h1>
+        <p>Connect your Meta Quest via USB to inject standalone mods instantly.</p>
         
         <button id="connectBtn">🔌 Connect VR Headset</button>
         
@@ -62,9 +70,11 @@
     </div>
 
     <script>
+        // Global library extractions
         const Adb = window['@yume-chan/adb']?.Adb;
         const AdbWebUsbBackend = window['@yume-chan/adb-backend-webusb']?.AdbWebUsbBackend;
 
+        // Swapped out SongDownloader for CoreMods.qmod with zero-fetch layout
         const modConfig = {
             "bonelab_mods": [
                 "Mulletman2113.WagieFord.pallet.json",
@@ -73,20 +83,21 @@
                 "catalog_Mulletman2113.WagieFord.json"
             ],
             "beatsaber_mods": [
-                "SongDownloader.qmod"
+                "CoreMods.qmod"
             ]
         };
 
         document.getElementById('connectBtn').addEventListener('click', async () => {
             const statusText = document.getElementById('status');
             statusText.style.color = "#ffffff";
-            statusText.innerText = "Status: Initializing connection protocol...";
+            statusText.innerText = "Status: Connecting to browser USB driver...";
 
             try {
                 if (!Adb || !AdbWebUsbBackend) {
-                    throw new Error("ADB drivers failed to load. Check your internet connection!");
+                    throw new Error("Drivers failed to initialize. Check your network connection!");
                 }
 
+                // Triggers the headset picker popup immediately
                 const device = await navigator.usb.requestDevice({ filters: [] });
                 statusText.innerText = `Status: Found ${device.productName}. Opening protocol pathways...`;
 
@@ -98,7 +109,7 @@
 
                 const sync = await adb.sync();
 
-                // 1. INJECT BONELAB MODS (Looks inside your mods/bonelab subfolder path!)
+                // 1. INJECT BONELAB MODS (Looks inside your mods/bonelab subfolder path)
                 statusText.innerText = "Status: Injecting avatar files into BONELAB partition...";
                 const bonelabFolder = '/sdcard/Android/data/com.StressLevelZero.BONELAB/files/Mods/';
 
@@ -116,8 +127,8 @@
                     }
                 }
 
-                // 2. INJECT BEAT SABER MODS (Looks inside your root directory path!)
-                statusText.innerText = "Status: Injecting custom configurations into Beat Saber...";
+                // 2. INJECT BEAT SABER MODS (Pushes CoreMods.qmod directly to target directory)
+                statusText.innerText = "Status: Injecting core configurations into Beat Saber...";
                 const beatSaberFolder = '/sdcard/ModData/com.beatgames.beatsaber/Mods/';
 
                 for (const modName of modConfig.beatsaber_mods) {
