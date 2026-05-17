@@ -1,0 +1,30 @@
+name: Build Desktop App Installer
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - name: Checkout Repository Assets
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Runtime Environment
+        uses: actions/setup-node@v4
+        with:
+          node-node: 20
+
+      - name: Install Compiling Dependencies
+        run: npm install
+
+      - name: Compile Standalone Application Executables
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then npm run build:win; fi
+          if [ "${{ matrix.os }}" = "macos-latest" ]; then npm run build:mac; fi
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then npm run build:linux; fi
+        shell: bash
